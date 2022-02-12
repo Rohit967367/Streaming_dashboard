@@ -20,6 +20,10 @@ module.exports = () => {
       storageBucket: "login-d4dde.appspot.com",
       messagingSenderId: "99120856004",
       appId: "1:99120856004:web:054b2d534dcab6d5c68291",
+      API_KEY: "2e817630-b783-455a-acb9-b836fe712bba",
+      SECRET_KEY:
+        "0a2d3a665153637278fcd10c8f9ad51e8660e65d747dd20b88a7fcb3dbe49d43",
+      NEXT_APP_VIDEOSDK_URL: "https://api.videosdk.live",
     },
   };
 };

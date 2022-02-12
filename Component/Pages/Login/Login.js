@@ -6,7 +6,6 @@ import Image from "next/image";
 import { Button } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/router";
 
 const Login = () => {
   const Signin = (e) => {
@@ -16,12 +15,9 @@ const Login = () => {
   };
   return (
     <Fragment>
-      <Head>
-        {/* <Link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Sofia"
-        /> */}
-      </Head>
+      {/* <Head>
+        
+      </Head> */}
       <div className={Classes.login}>
         <div className={Classes.conatin}>
           <div className={Classes.container}>

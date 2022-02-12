@@ -11,10 +11,14 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { NoteFor, SendURL, URLForm } from "../Add/Form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { OpenDailog, OpenNote } from "../../Store/Add";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "../../DB/DataBase";
+import { getStream } from "../../Store/Link";
+import { GetToken, GetURL } from "../../API/ApiCall";
 
-const steps = ["Note", "Stream Key", "Send URL"];
+const steps = ["Note", "Stream Key"];
 
 function getStepContent(step) {
   switch (step) {
@@ -22,8 +26,6 @@ function getStepContent(step) {
       return <NoteFor />;
     case 1:
       return <URLForm />;
-    case 2:
-      return <SendURL />;
     default:
       throw new Error("Unknown step");
   }
@@ -34,6 +36,8 @@ const theme = createTheme();
 export default function Note({ setHide }) {
   const [activeStep, setActiveStep] = React.useState(0);
   const dispatch = useDispatch();
+  const link = useSelector((state) => state.link);
+  const data = useSelector((state) => state.user);
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -47,6 +51,41 @@ export default function Note({ setHide }) {
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
+  };
+
+  React.useEffect(() => {
+    const APICALL = async () => {
+      const token = await GetToken();
+
+      const GetUrl = await GetURL(token.token);
+
+      dispatch(
+        getStream({
+          streamLink: GetUrl?.streamUrl,
+          streamKey: GetUrl?.streamKey,
+          streamURL: GetUrl?.downstreamUrl,
+        })
+      );
+      console.log(token.token);
+      console.log(GetUrl);
+    };
+
+    APICALL();
+  }, []);
+
+  const OnSubmit = async (e) => {
+    e.preventDefault();
+
+    const connectDB = collection(db, "stream");
+
+    await addDoc(connectDB, {
+      email: data.email,
+      name: data.name,
+      link: link.streamURL,
+      timestamp: serverTimestamp(),
+    });
+
+    dispatch(OpenDailog());
   };
 
   return (
@@ -77,12 +116,7 @@ export default function Note({ setHide }) {
                   confirmation, and will send you an update when your order has
                   shipped.
                 </Typography>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    dispatch(OpenDailog());
-                  }}
-                >
+                <Button variant="contained" onClick={OnSubmit}>
                   Close
                 </Button>
               </React.Fragment>

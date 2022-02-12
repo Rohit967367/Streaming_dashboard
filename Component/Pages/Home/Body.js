@@ -10,14 +10,23 @@ import {
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { db } from "../../DB/DataBase";
-import { OpenDailog } from "../../Store/Add";
+import {
+  OpenDailog,
+  UpdateButtonFalse,
+  UpdateButtonTrue,
+} from "../../Store/Add";
+import { collectData } from "../../Store/Link";
 import FormDialog from "./Dailog";
+import Link from "next/link";
+import { getData } from "../../Store/get";
 
 const Body = () => {
+  const [firebaseData, setFirebaseData] = useState([]);
+  const [goLive, setGoLive] = useState(false);
   const dispatch = useDispatch();
-  const [dataDB, setDataDB] = useState([]);
   const userData = useSelector((state) => state.user);
 
+  ////option
   useEffect(() => {
     const connectDB = collection(db, "stream");
     const queryForm = query(
@@ -27,17 +36,26 @@ const Body = () => {
     );
 
     const finalData = onSnapshot(queryForm, (snapshot) => {
-      setDataDB(
+      setFirebaseData(
         snapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
           timestamp: doc.data().timestamp?.toDate().getTime(),
+          name: userData.name,
         }))
       );
     });
-  }, []);
+    return finalData;
+  }, [userData]);
 
-  console.log(dataDB);
+  useEffect(() => {
+    if (firebaseData[0]) {
+      setGoLive(true);
+      dispatch(getData(firebaseData[0]));
+    } else {
+      setGoLive(false);
+    }
+  }, [firebaseData]);
 
   const openDial = () => {
     dispatch(OpenDailog());
@@ -51,9 +69,17 @@ const Body = () => {
         height: "calc(100vh - 50px)",
       }}
     >
-      <Button variant="contained" onClick={openDial}>
-        Go Live
-      </Button>
+      {goLive ? (
+        <Link href={"/live"}>
+          <Button variant="contained" color="success">
+            Go Live
+          </Button>
+        </Link>
+      ) : (
+        <Button variant="contained" onClick={openDial}>
+          Start Stream
+        </Button>
+      )}
       <FormDialog />
     </div>
   );

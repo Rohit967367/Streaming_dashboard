@@ -5,6 +5,7 @@ const Add = createSlice({
   initialState: {
     openDial: false,
     openNote: false,
+    updateButton: true,
   },
   reducers: {
     OpenDailog(state, action) {
@@ -13,9 +14,16 @@ const Add = createSlice({
     OpenNote(state) {
       state.openNote = !state.openNote;
     },
+    UpdateButtonTrue(state) {
+      state.updateButton = true;
+    },
+    UpdateButtonFalse(state) {
+      state.updateButton = false;
+    },
   },
 });
 
-export const { OpenDailog, OpenNote } = Add.actions;
+export const { OpenDailog, OpenNote, UpdateButtonTrue, UpdateButtonFalse } =
+  Add.actions;
 
 export default Add.reducer;
